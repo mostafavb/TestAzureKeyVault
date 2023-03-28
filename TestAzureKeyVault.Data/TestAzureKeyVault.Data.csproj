@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TestAzureKeyVault.Shared\TestAzureKeyVault.Shared.csproj" />
-    <ProjectReference Include="..\TestAzureKeyVault\Shared\TestAzureKeyVault.Shared.csproj" />
   </ItemGroup>
 
 </Project>
