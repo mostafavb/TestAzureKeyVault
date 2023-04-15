@@ -9,13 +9,21 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="2.6.1" />
+    <PackageReference Include="FastEndpoints" Version="5.8.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.7.0" />
+    <PackageReference Include="Newtonsoft.Json.Encryption" Version="2.2.0" />
+    <PackageReference Include="NServiceBus.Newtonsoft.Encryption" Version="2.2.0" />
+    <PackageReference Include="Rebus.Newtonsoft.Encryption" Version="2.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TestAzureKeyVault.Data\TestAzureKeyVault.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

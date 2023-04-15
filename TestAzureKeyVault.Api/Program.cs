@@ -1,27 +1,52 @@
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
+using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using TestAzureKeyVault.Api.Endpoints;
+using TestAzureKeyVault.Api.Services;
 using TestAzureKeyVault.Data;
+using TestAzureKeyVault.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var config = builder.Configuration;
 
-builder.Configuration.AddAzureKeyVault(
+config.AddAzureKeyVault(
     new Uri(config["KeyVault:URL"]!),
     new DefaultAzureCredential(),
     new KeyVaultSecretManager()
     );
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(config);
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(config.GetSection("AzureAd"));
+
+builder.Services.AddSingleton<ICrypto, Crypto>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:28722",
+                    "https://localhost:44344",
+                    "https://localhost:44398",
+                    "https://localhost:5001")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                    //.AllowAnyOrigin();
+        });
+});
+
+builder.Services.AddSingleton(typeof(IClientConfigurationManager), typeof(ClientConfigurationManager));
+
+builder.Services.AddFastEndpoints();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Swagger Azure AD Demo", Version = "v1" });
@@ -54,7 +79,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.DataServicesRegistration(builder.Configuration);
+
+builder.Services.DataServicesRegistration(config);
 
 var app = builder.Build();
 
@@ -77,4 +103,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseFastEndpoints();
+app.UseCors("MyPolicy");
 app.Run();

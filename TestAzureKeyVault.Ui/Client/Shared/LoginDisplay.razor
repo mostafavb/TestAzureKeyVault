@@ -1,0 +1,25 @@
+﻿@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity?.Name!
+        <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        @*<button class="nav-link btn btn-link" @onclick="BeginLogIn">Log in</button>*@
+        <a href="authentication/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    void BeginLogOut()
+    {
+        Navigation.NavigateToLogout("authentication/logout");
+        //Navigation.NavigateTo("authentication/logout?post_logout_redirect_uri=/");
+    }
+    void BeginLogIn()
+    {
+        //Navigation.NavigateToLogout("authentication/logout");
+        Navigation.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}");
+    }
+}

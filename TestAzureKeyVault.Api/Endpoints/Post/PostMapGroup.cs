@@ -8,6 +8,7 @@ public static class PostMapGroup
 {
     public static RouteGroupBuilder MapPosts(this RouteGroupBuilder group)
     {
+        //group.MapGet("/", async (IPostRepository repository) =>
         group.MapGet("/", [Authorize(Roles = "Manager"), RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")] async (IPostRepository repository) =>
         {
             var posts = await repository.GetAll();
