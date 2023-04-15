@@ -32,14 +32,6 @@ public sealed class ClientConfigurationManager : IClientConfigurationManager
                 }
             };
         }
-        var recivedByte = Encoding.UTF8.GetBytes(Convert.ToBase64String(string64ToByte));
-        var stringRecivedByte = Encoding.UTF8.GetString(recivedByte);
-        
-        var byte1 = Convert.FromBase64String(stringRecivedByte);
-        var string1 = Encoding.UTF8.GetString(byte1);
-
-        var byte2 = Convert.FromBase64String(string1);
-        var string2 = Encoding.UTF8.GetString(byte2);
 
     }
 
