@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using TestAzureKeyVault.Shared.Services;
 using TestAzureKeyVault.Ui;
+using TestAzureKeyVault.Ui.Configurations;
 using TestAzureKeyVault.Ui.Infrastructures;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -11,23 +11,30 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 var config = builder.Configuration;
-var apiName = "TestAzureKeyVault.API";
+var clientName = "TestAzureKeyVault.Ui.ServerAPI";
+string apiUrl = "https://localhost:7267";
 
-builder.Services.AddHttpClient(apiName, client => client.BaseAddress = new Uri("https://localhost:7267"))
-   .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+builder.Services.Configure<ApiSettingOptions>(ops =>
+{
+    ops.ApiUrl = apiUrl;
+    ops.ClientName = clientName;
+});
 
+builder.Services.AddScoped<ApiAuthorizationMessageHandler>();
+
+builder.Services.AddHttpClient(clientName, client =>
+{
+    client.BaseAddress = new Uri(apiUrl);
+})
+.AddHttpMessageHandler<ApiAuthorizationMessageHandler>();
 
 builder.Services.AddSingleton<ICrypto, Crypto>();
 
-builder.Services.AddScoped(sp =>
-{
-    var s = sp.GetRequiredService<IHttpClientFactory>().CreateClient(apiName);
-    return s;
-});
+await builder.ImportConfiguration(apiUrl);
+
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient(clientName));
 
 builder.Services.AddMudServices();
-
-await builder.ImportConfiguration("https://localhost:7267");
 
 builder.Services.AddMsalAuthentication(options =>
 {

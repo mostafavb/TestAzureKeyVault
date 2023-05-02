@@ -1,9 +1,14 @@
+global using TestAzureKeyVault.Shared.Constants;
+
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
+using TestAzureKeyVault.Api.Configurations;
 using TestAzureKeyVault.Api.Endpoints;
 using TestAzureKeyVault.Api.Services;
 using TestAzureKeyVault.Data;
@@ -19,10 +24,24 @@ config.AddAzureKeyVault(
     new KeyVaultSecretManager()
     );
 
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(config.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApi(config.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddInMemoryTokenCaches();
 
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy(Authorization.Policies.AdminsGroup, policy =>
+        policy.Requirements.Add(new GroupAuthorizationRequirement(config["AzureAdAppAuthorization:AppAdminsGroupId"]!)));
+
+    opt.AddPolicy(Authorization.Policies.AppUsersGroup, policy =>
+        policy.Requirements.Add(new GroupAuthorizationRequirement(config["AzureAdAppAuthorization:AppUsersGroupId"]!)));
+
+    opt.AddPolicy(Authorization.Policies.AppEditors, policy =>
+        policy.RequireRole(Authorization.Roles.Editor));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, GroupAuthorizationHandler>();
 builder.Services.AddSingleton<ICrypto, Crypto>();
 
 builder.Services.AddCors(options =>
@@ -30,13 +49,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:28722",
-                    "https://localhost:44344",
-                    "https://localhost:44398",
-                    "https://localhost:5001")
+            policy
+                   
+                    .AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader();
-                    //.AllowAnyOrigin();
+            
         });
 });
 
@@ -96,13 +114,16 @@ if (app.Environment.IsDevelopment())
         c.OAuthUsePkce();
         c.OAuthScopeSeparator(" ");
     });
+    IdentityModelEventSource.ShowPII = true;
 }
 
 app.UseHttpsRedirection();
+app.UseCors("MyPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseFastEndpoints();
-app.UseCors("MyPolicy");
+
+
 app.Run();

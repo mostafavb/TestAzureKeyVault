@@ -12,6 +12,7 @@
 		<PackageReference Include="MudBlazor" Version="6.2.1" />
 		<PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="7.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -21,8 +22,6 @@
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Configurations\" />
 	  <Folder Include="Extensions\" />
-	  <Folder Include="Services\" />
 	</ItemGroup>
 </Project>

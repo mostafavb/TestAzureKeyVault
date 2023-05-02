@@ -1,60 +1,41 @@
 ﻿@page "/posts/index"
-
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
-@using TestAzureKeyVault.Shared.Models
-
-@attribute [Authorize]
-@inject HttpClient Http
-@inject IAccessTokenProviderAccessor AccessProvider
+@using TestAzureKeyVault.Shared.Models;
 
 <PageTitle>Posts</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">Posts</MudText>
-<MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
-@if (Responses is null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-}
-else
-{
-    <MudTable Items="Responses" Hover="true" SortLabel="Sort By" Elevation="0">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Post, object>(x=>x.Title)">Title</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Post, object>(x=>x.Content)">Content</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Title">@context.Title</MudTd>
-            <MudTd DataLabel="Content">@context.Content</MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{50, 100}" />
-        </PagerContent>
-    </MudTable>
-}
-
-@code {
-    public List<Post>? Responses { get; set; }
-    protected override async Task OnInitializedAsync()
-    {
-        //Http.DefaultRequestHeaders.Authorization =
-        //        new AuthenticationHeaderValue("Bearer", "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiJhcGk6Ly9lYjdhM2ZlMS1hM2U2LTQ0MjUtYjk2Zi1iYzUxYmNiYjViMGIiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83M2YwMmY1ZS01M2M5LTRmMTctOWFjYS1kMDQzODkzNTQzOTEvIiwiaWF0IjoxNjgwMjE5ODQ0LCJuYmYiOjE2ODAyMTk4NDQsImV4cCI6MTY4MDIyNDcwNCwiYWNyIjoiMSIsImFpbyI6IkFYUUFpLzhUQUFBQUF5Yjg2clNhQkt2V0tSL0JFcWZmSkR3aUV0TWsrSWVtOGpxUDBraVlENGtqamhqdzJHU1dDTjhrOGc3dCtWZklZM1JFVldTUmJmd2k2ZjBMRFdrZTBVNEZMV2UvYUFOd0VIMzJXK3ZUcEhNR0o5RjNKbFNaQy8zQ0ZFYnEyaElVNmtnZ3ZoN2NHMWJGdWNzZjhabTZaZz09IiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6ImE0NzNiYjkzLWQ0NTYtNDVhMy04NmY4LTg2OTIxMjE1NTQ0NiIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoibW9zdGFmYS52YXppbmlAbGl2ZS5jb20iLCJmYW1pbHlfbmFtZSI6InZhemluaSIsImdpdmVuX25hbWUiOiJtb3N0YWZhIiwiaWRwIjoibGl2ZS5jb20iLCJpcGFkZHIiOiI1MC42OC4yNDkuMTE0IiwibmFtZSI6Im1vc3RhZmEgdmF6aW5pIiwib2lkIjoiMzk1NzZjMjYtZDMyMC00ZDJhLTg1ZDEtOGIzZjRkNTNlNWNhIiwicmgiOiIwLkFSc0FYaV93YzhsVEYwLWF5dEJEaVRWRGtlRV9ldXZtb3lWRXVXLThVYnk3V3dzYkFIRS4iLCJyb2xlcyI6WyJNYW5hZ2VyIl0sInNjcCI6ImFwaV9hY2Nlc3MiLCJzdWIiOiJqZFlmTDJXMTlkQW9JREdRWEgwWmVPNlkwOGpWZ1JPcHRMdk5WOXFfN1NvIiwidGlkIjoiNzNmMDJmNWUtNTNjOS00ZjE3LTlhY2EtZDA0Mzg5MzU0MzkxIiwidW5pcXVlX25hbWUiOiJsaXZlLmNvbSNtb3N0YWZhLnZhemluaUBsaXZlLmNvbSIsInV0aSI6ImxQWWVPd0x1bmthcThhWWVXVF9DQUEiLCJ2ZXIiOiIxLjAifQ.hIT3gRKThLom3tHbxXTnRbWmFdrzv5EK-kY27TQAKKv1ly8gbZeiNVQL1UFKi6TMf0s6g3keqOHH4T5h5pM-eIg8gBUc8F9w4yF6YOeoKLu9PhdNcNV1BWkMswYTHevzYiKt7ZM5IDss-W4olsrf5EXZUYBzFJ5CBhTQjJTQCXZLHOQFJ0jKNMPURXlOsNk-d96aFLCrsXsy6E0OtQECSGfLoKQvWXvwB3oqPUDmCOFuOEyJIKZCgroJ3-yj8V-GANMRf14a5ZTRZFhph6b9GDGQm61cgC7CmGPmGmhFpOfE-_D1J_z_rv70-PQw7YheygbkeTwe1_bN9ZNJwb7I6g");
-
-        try
+<AuthorizeView>
+    <NotAuthorized>
+        <MudText Class="mb-8">You are not authorized.  Data will not be loaded.</MudText>
+    </NotAuthorized>
+    <Authorized>
+        @if (Responses is null)
         {
-
-            var rat = await AccessProvider.TokenProvider.RequestAccessToken();
-
-            if (rat.TryGetToken(out var token))
+            if (hasPermissionDenied)
             {
-                Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Value);
-                Responses = await Http.GetFromJsonAsync<List<Post>>("api/post");
+                <MudText Class="mb-8">Permission denied. You don't have access to this section.</MudText>
+            }
+            else
+            {
+                <MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
+                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
             }
         }
-        catch (AccessTokenNotAvailableException exception)
+        else
         {
-            exception.Redirect();
+            <MudTable Items="Responses" Hover="true" SortLabel="Sort By" Elevation="0">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Post, object>(x=>x.Title)">Title</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Post, object>(x=>x.Content)">Content</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate Context="dataContext">
+                    <MudTd DataLabel="Title">@dataContext.Title</MudTd>
+                    <MudTd DataLabel="Content">@dataContext.Content</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager PageSizeOptions="new int[]{50, 100}" />
+                </PagerContent>
+            </MudTable>
         }
-
-
-    }
-}
+    </Authorized>
+</AuthorizeView>

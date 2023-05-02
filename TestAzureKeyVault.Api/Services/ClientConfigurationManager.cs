@@ -7,7 +7,7 @@ namespace TestAzureKeyVault.Api.Services;
 public sealed class ClientConfigurationManager : IClientConfigurationManager
 {
     private readonly Dictionary<string, ClientConfiguration> _clients = new();
-
+    private readonly ICrypto _crypto;
 
     public ClientConfigurationManager(IConfiguration configuration, IServiceProvider services, ICrypto crypto)
     {
@@ -32,7 +32,7 @@ public sealed class ClientConfigurationManager : IClientConfigurationManager
                 }
             };
         }
-
+        _crypto = crypto;
     }
 
     public async Task<ClientConfiguration> GetClientConfiguration(string? clientType)
@@ -52,7 +52,7 @@ public sealed class ClientConfigurationManager : IClientConfigurationManager
         {
             var c = _clients[clientType] ?? new();
             var serialized = JsonSerializer.SerializeToUtf8Bytes(c);
-            return await Task.FromResult(Convert.ToBase64String(serialized));
+            return await Task.FromResult(_crypto.EncryptByKeyInternal(Convert.ToBase64String(serialized),"EmptyKey"));
         }
         return "Nothing found for this config!";
        

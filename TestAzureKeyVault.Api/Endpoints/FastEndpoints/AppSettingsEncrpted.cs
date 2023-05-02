@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using TestAzureKeyVault.Api.Services;
-using TestAzureKeyVault.Shared.Models;
 
 namespace TestAzureKeyVault.Api.Endpoints.FastEndpoints;
 

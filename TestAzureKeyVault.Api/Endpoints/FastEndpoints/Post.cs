@@ -1,13 +1,12 @@
 ﻿using FastEndpoints;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Identity.Web.Resource;
+using Microsoft.Identity.Web;
 using System.Data;
 using TestAzureKeyVault.Shared.Contracts;
 using TestAzureKeyVault.Shared.Models;
 
 namespace TestAzureKeyVault.Api.Endpoints.FastEndpoints;
 
-//[Authorize(Roles = "Manager"), RequiredScope(RequiredScopesConfigurationKey = "AzureAd:Scopes")]
+
 public class Post : Endpoint<EmptyRequest, List<Response>, Mapper>
 {
     private readonly IPostRepository _repository;
@@ -18,12 +17,16 @@ public class Post : Endpoint<EmptyRequest, List<Response>, Mapper>
     }
     public override void Configure()
     {
-        AllowAnonymous();
         Get("api/fast/post");
 
+        Options(b => b
+            .RequireScope(Authorization.Scopes.ApiReadWrite)
+            .RequireAuthorization(Authorization.Policies.AdminsGroup, Authorization.Policies.AppEditors));        
     }
+
     public override async Task HandleAsync(EmptyRequest req, CancellationToken ct)
     {
+        Console.WriteLine(HttpContext.User?.Identity?.Name);
         var posts = await _repository.GetAll();
         await SendAsync(Map.FromEntity(posts));
     }

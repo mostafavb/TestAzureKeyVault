@@ -27,8 +27,10 @@ public static class ConfigExtension
                 };
                 
                 var recivedString = await http.GetFromJsonAsync<string>("/config/appsettingsencrypted/Setted");
+
+                string firstDecryptedString = crypto.DecryptByKeyInternal(recivedString!, "EmptyKey");
                 
-                var recivedByte = Convert.FromBase64String(recivedString!);
+                var recivedByte = Convert.FromBase64String(firstDecryptedString!);
 
                 var recivedConfig = JsonSerializer.Deserialize<ClientConfiguration>(recivedByte!);
                 
